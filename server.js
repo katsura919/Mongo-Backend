@@ -10,7 +10,13 @@ connectDB();
 const app = express();
 
 // Use CORS middleware to allow requests from your frontend (localhost:3000)
-app.use(cors());
+app.use(cors({
+  origin: 'https://mongo-next-js-rytq.vercel.app', // Your frontend URL
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true // If using cookies or authentication
+}));
+
 
 // Middleware to parse incoming JSON data
 app.use(express.json());
