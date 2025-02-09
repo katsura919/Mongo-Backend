@@ -17,7 +17,7 @@ const server = http.createServer(app); // Create HTTP server
 
 // ✅ Middleware (CORS & JSON Parsing)
 app.use(cors({
-  origin: "https://mongo-next-js-rytq.vercel.app",
+  origin: "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -26,7 +26,7 @@ app.use(express.json());
 
 // ✅ Extra middleware to ensure CORS works properly
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://mongo-next-js-rytq.vercel.app");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 // ✅ Initialize Socket.io with proper CORS settings
 const io = new Server(server, {
   cors: {
-    origin: "https://mongo-next-js-rytq.vercel.app",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -63,13 +63,9 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (message) => {
     console.log("📩 New message:", message);
 
-    const receiverSockets = io.sockets.adapter.rooms.get(message.receiverEmail);
-    if (!receiverSockets || receiverSockets.size === 0) {
-      console.log(`❌ Receiver ${message.receiverEmail} is not online.`);
-    } else {
-      console.log(`✅ Receiver ${message.receiverEmail} is online, sending message.`);
-      io.to(message.receiverEmail).emit("receiveMessage", message);
-    }
+  
+    io.to(message.receiverEmail).emit("receiveMessage", message);
+
   });
 
   // 🔹 Handle disconnects & remove from rooms
