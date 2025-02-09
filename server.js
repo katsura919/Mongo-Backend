@@ -15,24 +15,25 @@ connectDB();
 const app = express();
 const server = http.createServer(app); // Create HTTP server
 
-// Initialize Socket.io
-const io = new Server(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST']
-  }
-});
-
-// Middleware
+// ✅ Middleware - Place before defining Socket.io
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: "https://mongo-next-js-rytq.vercel.app",
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-
 app.use(express.json());
+
+// ✅ Initialize Socket.io with proper CORS settings
+const io = new Server(server, {
+  cors: {
+    origin: "https://mongo-next-js-rytq.vercel.app",
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }
+});
 
 // Routes
 app.use('/api', userRoutes);  
