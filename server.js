@@ -17,7 +17,7 @@ const server = http.createServer(app); // Create HTTP server
 
 // ✅ Middleware (CORS & JSON Parsing)
 app.use(cors({
-  origin: "https://mongo-next-js-rho.vercel.app/",
+  origin: "https://mongo-next-js-rho.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -26,7 +26,7 @@ app.use(express.json());
 
 // ✅ Extra middleware to ensure CORS works properly
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://mongo-next-js-rho.vercel.app/");
+  res.header("Access-Control-Allow-Origin", "https://mongo-next-js-rho.vercel.app");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 // ✅ Initialize Socket.io with proper CORS settings
 const io = new Server(server, {
   cors: {
-    origin: "https://mongo-next-js-rho.vercel.app/",
+    origin: "https://mongo-next-js-rho.vercel.app",
     
   },
 });
