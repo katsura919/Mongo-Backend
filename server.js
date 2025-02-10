@@ -17,7 +17,7 @@ const server = http.createServer(app); // Create HTTP server
 
 // ✅ Middleware (CORS & JSON Parsing)
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://mongo-next-js-rho.vercel.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -26,7 +26,7 @@ app.use(express.json());
 
 // ✅ Extra middleware to ensure CORS works properly
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Origin", "https://mongo-next-js-rho.vercel.app/");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
@@ -34,10 +34,8 @@ app.use((req, res, next) => {
 // ✅ Initialize Socket.io with proper CORS settings
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+    origin: "https://mongo-next-js-rho.vercel.app/",
+    
   },
 });
 
@@ -50,22 +48,21 @@ app.use("/api/conversations", conversationRoutes);
 io.on("connection", (socket) => {
   console.log(`🔗 User connected: ${socket.id}`);
 
-  // 🔹 Join user-specific room using email
-  socket.on("joinRoom", (userEmail) => {
-    if (userEmail) {
-      socket.join(userEmail);
-      console.log(`✅ User ${userEmail} joined room`);
-      socket.emit("roomJoined", userEmail); // Confirmation to the client
+  // 🔹 Join user to the conversation room using conversationId
+  socket.on("joinRoom", (conversationId) => {
+    if (conversationId) {
+      socket.join(conversationId);
+      console.log(`✅ User ${socket.id} joined room: ${conversationId}`);
+      socket.emit("roomJoined", conversationId); // Confirmation to the client
     }
   });
 
-  // 🔹 Listen for messages & send to the recipient's room
+  // 🔹 Listen for messages & send to the conversation's room
   socket.on("sendMessage", (message) => {
     console.log("📩 New message:", message);
 
-  
-    io.to(message.receiverEmail).emit("receiveMessage", message);
-
+    // Send to the room (conversationId) instead of using receiverEmail
+    io.to(message.conversationId).emit("receiveMessage", message);
   });
 
   // 🔹 Handle disconnects & remove from rooms
@@ -81,6 +78,7 @@ io.on("connection", (socket) => {
     }
   });
 });
+
 
 // ✅ Start the server
 const PORT = process.env.PORT || 5000;
